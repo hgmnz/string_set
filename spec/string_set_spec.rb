@@ -1,5 +1,15 @@
 require 'string_set'
 
+shared_context 'interacting with another set' do
+  let(:another_set) { StringSet.new }
+  before do
+    another_set.add 'awesome'
+    another_set.add 'fantastic'
+    subject.add 'awesome'
+    subject.add 'super'
+  end
+end
+
 describe StringSet do
   subject { StringSet.new }
 
@@ -94,23 +104,17 @@ describe StringSet do
 
     it 'equals another set if it has the same items' do
       subject.add('fantastic')
-      (subject == another_set).should be_true
+      subject.should be == another_set
     end
 
     it 'does not equal another set if the items do not match' do
       subject.add('super')
-      (subject == another_set).should be_false
+      subject.should_not be == another_set
     end
   end
 
   context 'the union of two sets' do
-    let(:another_set) { StringSet.new }
-    before do
-      another_set.add 'awesome'
-      another_set.add 'fantastic'
-      subject.add 'awesome'
-      subject.add 'super'
-    end
+    include_context 'interacting with another set'
 
     it 'gives a new set with all items from both sets' do
       union = subject.union(another_set)
@@ -123,14 +127,7 @@ describe StringSet do
   end
 
   context 'the intersection of two sets' do
-    let(:another_set) { StringSet.new }
-    before do
-      another_set.add 'awesome'
-      another_set.add 'fantastic'
-      subject.add 'awesome'
-      subject.add 'super'
-    end
-
+    include_context 'interacting with another set'
     it 'gives a new set with the common set members' do
       intersection = subject.intersect(another_set)
       intersection.size.should == 1
